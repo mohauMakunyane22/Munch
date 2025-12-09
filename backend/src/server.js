@@ -9,12 +9,14 @@ const PORT = 5000;
 let vendors = [
   {
     id: 1,
+    vendorNumber: "V001",
     name: "Pizza Place",
     location: "Downtown",
     tags: ["Fast Food", "Italian"],
   },
   {
     id: 2,
+    vendorNumber: "V002",
     name: "Sushi Spot",
     location: "Uptown",
     tags: ["Japanese", "Seafood"],
@@ -85,6 +87,19 @@ app.put("/orders/:id/status", (req, res) => {
   order.status = status;
   res.json(order);
 });
+//vendor login (dummy)
+app.post("/vendor/login", (req, res) => {
+  const { vendorNumber } = req.body;
+  const vendor = vendors.find((v) => v.vendorNumber === vendorNumber);
+  if (!vendor)
+    return res.status(404).json({ error: "Vendor number not recognized" });
+  res.json({ message: "Login successful", vendorId: vendor.id });
+});
+
+app.get("/vendor/orders", (req, res) => {
+  res.json(orders); // using your dummy order data
+});
+
 //listening to the server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

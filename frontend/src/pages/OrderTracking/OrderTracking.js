@@ -35,11 +35,12 @@ const OrderTracking = () => {
   if (!order) return <p>Loading order...</p>;
 
   // Calculate total
+  /**
   const totalPrice = order.items.reduce((total, item) => {
     const price = vendorFoods[item.foodId] ? item.price || 0 : 0; // optional if price available
     return total + item.qty * (item.price || 0); // using dummy data price if available
   }, 0);
-
+ */
   return (
     <div style={{ padding: "20px" }}>
       <h1>Order #{order.id}</h1>
