@@ -1,65 +1,98 @@
+/* Header container */
 .header {
-  background: white;
+  background: #fdf8f4; /* soft off-white */
   padding: 0;
-  border-bottom: 1px solid #e72929;
+  border-bottom: 2px solid #ffe8d9; /* soft peach */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
-.header a {
-  color: #af1313;
-}
-
-.header a:hover {
-  background: #e72929;
-  color: white;
-  cursor: pointer;
-}
-
+/* Navigation container */
 .container {
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 1.2rem;
 }
 
+/* Logo */
 .logo {
-  font-weight: bold;
-  padding: 1rem;
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: #e28a4e; /* burnt orange */
+  padding: 0.6rem;
 }
 
+/* Links */
+.header a {
+  color: #a15c38; /* warm taupe */
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+/* Hover state */
+.header a:hover {
+  background: #ffe8d9; /* muted gold/peach */
+  color: #e28a4e; /* burnt orange highlight */
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+/* Nav list */
 .header ul {
   display: flex;
   list-style-type: none;
   margin: 0;
+  padding: 0;
 }
 
 .header ul a {
-  padding: 1rem;
+  padding: 0.8rem 1rem;
   display: inline-block;
 }
 
+/* Dropdown container */
 .menu_container {
   position: relative;
 }
 
+/* Dropdown menu */
 .menu {
   position: absolute;
   z-index: 1001;
-  background-color: whitesmoke;
+  background-color: #fff;
   display: none;
+  border: 1px solid #ffe8d9;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  overflow: hidden;
 }
 
 .menu_container:hover .menu {
   display: block;
 }
 
+/* Dropdown items */
 .menu a {
   width: 100%;
-  min-width: 8rem;
+  min-width: 9rem;
+  padding: 0.8rem 1rem;
+  display: block;
+  color: #a15c38;
 }
 
+.menu a:hover {
+  background-color: #ffe8d9;
+  color: #e28a4e;
+}
+
+/* Cart pill */
 .cart_count {
-  background-color: #ff4d4d;
+  background-color: #e28a4e; /* burnt orange */
   color: white;
-  padding: 0.1rem 0.45rem;
-  border-radius: 100rem;
-  font-size: 0.9rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 600;
 }

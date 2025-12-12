@@ -1,0 +1,61 @@
+/* Container */
+.home-container {
+  padding: 30px;
+  background: #fdf8f4; /* off white / soft peach */
+  min-height: 100vh;
+}
+
+/* Title */
+.home-title {
+  text-align: center;
+  color: #a15c38; /* warm taupe */
+  font-size: 2.2rem;
+  margin-bottom: 40px;
+  font-weight: 600;
+}
+
+/* Grid Layout */
+.vendor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 25px;
+}
+
+/* Cards */
+.vendor-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 25px;
+  text-align: center;
+  cursor: pointer;
+  border: 1px solid #fad7c3; /* soft peach border */
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+}
+
+.vendor-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  border-color: #e28a4e; /* burnt orange pop */
+}
+
+/* Card text */
+.vendor-name {
+  color: #e28a4e; /* burnt orange */
+  margin-bottom: 10px;
+}
+
+.vendor-location {
+  color: #a15c38;
+  margin-bottom: 5px;
+}
+
+.vendor-tags {
+  background: #ffe8d9; /* muted gold peach */
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  margin-top: 10px;
+  color: #7a4a2b;
+  font-size: 0.9rem;
+}
