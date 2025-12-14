@@ -5,8 +5,9 @@ import API from "../../api";
 import "./VendorPage.css";
 
 const VendorPage = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // vendor _id
   const navigate = useNavigate();
+
   const [vendor, setVendor] = useState(null);
   const [cart, setCart] = useState([]);
 
@@ -18,36 +19,41 @@ const VendorPage = () => {
 
   const addToCart = (food) => {
     setCart((prev) => {
-      const existing = prev.find((item) => item.food.id === food.id);
+      const existing = prev.find((item) => item.food._id === food._id);
+
       if (existing) {
         return prev.map((item) =>
-          item.food.id === food.id ? { ...item, qty: item.qty + 1 } : item
+          item.food._id === food._id ? { ...item, qty: item.qty + 1 } : item
         );
-      } else {
-        return [...prev, { food, qty: 1 }];
       }
+
+      return [...prev, { food, qty: 1 }];
     });
   };
 
-  const placeOrder = () => {
+  const placeOrder = async () => {
     if (cart.length === 0) {
-      alert("Cart is empty!");
+      alert("Cart is empty");
       return;
     }
 
-    const items = cart.map((c) => ({ foodId: c.food.id, qty: c.qty }));
+    try {
+      const items = cart.map((c) => ({
+        foodId: c.food._id,
+        quantity: c.qty,
+      }));
 
-    API.post("/orders", {
-      vendorId: vendor.id,
-      customerName: "Test Customer",
-      items,
-    })
-      .then((res) => {
-        alert(`Order placed! Order ID: ${res.data.id}`);
-        setCart([]);
-        navigate(`/order/${res.data.id}`);
-      })
-      .catch((err) => console.error(err));
+      const res = await API.post("/orders", {
+        vendorId: vendor._id,
+        customerName: "Test Customer",
+        items,
+      });
+
+      setCart([]);
+      navigate(`/order/${res.data._id}`);
+    } catch (err) {
+      console.error("Error placing order:", err);
+    }
   };
 
   if (!vendor) return <p>Loading vendor...</p>;
@@ -56,19 +62,15 @@ const VendorPage = () => {
     <div className="vendor-page">
       <h1 className="vendor-title">{vendor.name}</h1>
       <p className="vendor-location">{vendor.location}</p>
-      <p className="vendor-tags">
-        Tags: {vendor.tags && vendor.tags.join(", ")}
-      </p>
 
       <h2 className="menu-title">Menu</h2>
+
       <div className="menu-grid">
         {vendor.foods.map((food) => (
-          <div key={food.id} className="food-card">
+          <div key={food._id} className="food-card">
             <h3>{food.name}</h3>
             <p className="food-price">R{food.price.toFixed(2)}</p>
-            <button className="add-btn" onClick={() => addToCart(food)}>
-              Add to Cart
-            </button>
+            <button onClick={() => addToCart(food)}>Add to Cart</button>
           </div>
         ))}
       </div>
@@ -76,16 +78,15 @@ const VendorPage = () => {
       {cart.length > 0 && (
         <div className="cart-section">
           <h2>Cart</h2>
-          <ul className="cart-list">
-            {cart.map((c) => (
-              <li key={c.food.id}>
-                {c.food.name} x {c.qty} – R{(c.food.price * c.qty).toFixed(2)}
+          <ul>
+            {cart.map((item) => (
+              <li key={item.food._id}>
+                {item.food.name} x {item.qty}
               </li>
             ))}
           </ul>
-          <button className="place-order-btn" onClick={placeOrder}>
-            Place Order
-          </button>
+
+          <button onClick={placeOrder}>Place Order</button>
         </div>
       )}
     </div>
