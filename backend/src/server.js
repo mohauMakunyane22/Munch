@@ -5,7 +5,7 @@ const cors = require("cors");
 require("dotenv").config();
 const connectDB = require("./config/db");
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 connectDB();
 //connect to mongodb
 
