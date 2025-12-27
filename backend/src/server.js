@@ -10,7 +10,14 @@ connectDB();
 //connect to mongodb
 
 //middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "https://munch-food.vercel.app"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
+
 app.use(express.json());
 
 //routes
