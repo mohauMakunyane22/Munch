@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import API from "../../api";
 
 const VendorLogin = () => {
   const [vendorNumber, setVendorNumber] = useState("");
@@ -7,25 +8,24 @@ const VendorLogin = () => {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
+    setError("");
+
+    if (!vendorNumber.trim()) {
+      setError("Vendor number is required");
+      return;
+    }
+
     try {
-      const res = await fetch("http://localhost:5000/vendor/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ vendorNumber }),
-      });
+      const res = await API.post("/vendors/login", { vendorNumber });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Login failed");
-        return;
-      }
-
-      // redirect to dashboard with vendorId
-      navigate(`/vendor/dashboard?vendorId=${data.vendorId}`);
+      // Redirect to vendor dashboard
+      navigate(`/vendor/dashboard/${res.data.vendorId}`);
     } catch (err) {
-      console.error(err);
-      setError("Server error");
+      if (err.response) {
+        setError(err.response.data.error || "Login failed");
+      } else {
+        setError("Server error");
+      }
     }
   };
 

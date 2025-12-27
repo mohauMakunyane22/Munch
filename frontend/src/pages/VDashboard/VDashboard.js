@@ -1,64 +1,53 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const VendorDashboard = () => {
+  const { vendorId } = useParams(); // Grab vendorId from the URL
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const location = useLocation();
-
-  // Extract vendorId from URL
-  const params = new URLSearchParams(location.search);
-  const vendorId = parseInt(params.get("vendorId"));
 
   useEffect(() => {
-    if (vendorId) {
-      fetchOrders();
-    }
-  }, [vendorId]); // Added vendorId dependency
+    if (!vendorId) return;
+    fetchOrders();
+  }, [vendorId]);
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch("http://localhost:5000/vendor/orders");
+      const res = await fetch(
+        `http://localhost:5000/orders/vendor/${vendorId}`
+      );
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch orders");
-      }
+      if (!res.ok) throw new Error("Failed to fetch orders");
 
       const data = await res.json();
-
-      // Filter only orders for that vendor
-      const vendorOrders = data.filter((o) => o.vendorId === vendorId);
-      setOrders(vendorOrders);
+      setOrders(data);
     } catch (err) {
+      console.error(err);
       setError(err.message);
-      console.error("Error fetching orders:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  const updateStatus = async (orderId, newStatus) => {
+  const updateStatus = async (orderId, status) => {
     try {
       const res = await fetch(
         `http://localhost:5000/orders/${orderId}/status`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: newStatus }),
+          body: JSON.stringify({ status }),
         }
       );
 
-      if (!res.ok) {
-        throw new Error("Failed to update status");
-      }
-
-      fetchOrders(); // Refresh after update
+      if (!res.ok) throw new Error("Failed to update order");
+      fetchOrders();
     } catch (err) {
-      console.error("Error updating status:", err);
-      alert("Failed to update order status");
+      console.error(err);
+      alert("Could not update order status");
     }
   };
 
@@ -66,25 +55,17 @@ const VendorDashboard = () => {
     return (
       <div style={{ padding: "2rem" }}>
         <h2>Vendor Dashboard</h2>
-        <p>Error: No vendor ID provided in URL</p>
+        <p>You must be logged in as a vendor.</p>
       </div>
     );
   }
 
-  if (loading) {
-    return (
-      <div style={{ padding: "2rem" }}>
-        <h2>Vendor Dashboard</h2>
-        <p>Loading orders...</p>
-      </div>
-    );
-  }
+  if (loading) return <p style={{ padding: "2rem" }}>Loading orders...</p>;
 
   if (error) {
     return (
       <div style={{ padding: "2rem" }}>
-        <h2>Vendor Dashboard</h2>
-        <p style={{ color: "red" }}>Error: {error}</p>
+        <p style={{ color: "red" }}>{error}</p>
         <button onClick={fetchOrders}>Retry</button>
       </div>
     );
@@ -93,23 +74,27 @@ const VendorDashboard = () => {
   return (
     <div style={{ padding: "2rem" }}>
       <h2>Vendor Dashboard (ID: {vendorId})</h2>
-
-      {orders.length === 0 && <p>No orders for this vendor yet.</p>}
+      {orders.length === 0 && <p>No orders yet.</p>}
 
       {orders.map((order) => (
         <div
-          key={order.id}
+          key={order._id}
           style={{
-            border: "1px solid #ccc",
+            border: "1px solid #ddd",
             padding: "1rem",
             marginBottom: "1rem",
-            borderRadius: "10px",
+            borderRadius: "8px",
           }}
         >
-          <h3>Order ID: {order.id}</h3>
-
+          <h3>Order #{order._id.slice(-6)}</h3>
           <p>
             <strong>Customer:</strong> {order.customerName}
+          </p>
+          <p>
+            <strong>Status:</strong>{" "}
+            <span style={{ fontWeight: "bold" }}>
+              {order.status.toUpperCase()}
+            </span>
           </p>
 
           <p>
@@ -118,25 +103,19 @@ const VendorDashboard = () => {
           <ul>
             {order.items.map((item, index) => (
               <li key={index}>
-                {item.name} — x{item.quantity}
+                {item.foodId?.name} × {item.quantity} — R{item.foodId?.price}
               </li>
             ))}
           </ul>
 
-          <p>
-            <strong>Status:</strong> {order.status}
-          </p>
-
           <div style={{ display: "flex", gap: "0.5rem" }}>
-            <button onClick={() => updateStatus(order.id, "preparing")}>
+            <button onClick={() => updateStatus(order._id, "preparing")}>
               Preparing
             </button>
-
-            <button onClick={() => updateStatus(order.id, "ready")}>
+            <button onClick={() => updateStatus(order._id, "ready")}>
               Ready
             </button>
-
-            <button onClick={() => updateStatus(order.id, "completed")}>
+            <button onClick={() => updateStatus(order._id, "completed")}>
               Completed
             </button>
           </div>

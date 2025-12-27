@@ -1,41 +1,53 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import classes from "./header.module.css";
 
-function logout() {
-  // Placeholder logout function
-  console.log("User logged out");
-}
-
 export default function Header() {
-  const user = { name: "John Doe" };
-  const cart = { totalCount: 10 };
+  const navigate = useNavigate();
+
+  // MVP auth check
+  const vendorId = localStorage.getItem("vendorId");
+
+  const cartCount = JSON.parse(localStorage.getItem("cart"))?.length || 0;
+
+  const handleLogout = () => {
+    localStorage.removeItem("vendorId");
+    navigate("/");
+  };
+
   return (
     <header className={classes.header}>
       <div className={classes.container}>
         <Link to="/" className={classes.logo}>
-          Food Mine!
+          Munch
         </Link>
+
         <nav>
           <ul>
-            {user ? (
-              <li className={classes.menu_container}>
-                <Link to="/dashboard">{user.name}</Link>
-                <div className={classes.menu}>
-                  <Link to="/profile">Profile</Link>
-                  <Link to="/orders">Orders</Link>
-                  <a onClick={logout}>Logout</a>
-                </div>
+            {/* Vendor auth */}
+            {!vendorId ? (
+              <li>
+                <Link to="/vendor/login">Vendor Login</Link>
               </li>
             ) : (
-              <Link to="/login">Login</Link>
+              <>
+                <li>
+                  <Link to={`/vendor/dashboard/${vendorId}`}>Dashboard</Link>
+                </li>
+                <li>
+                  <button onClick={handleLogout} className={classes.logout}>
+                    Logout
+                  </button>
+                </li>
+              </>
             )}
 
+            {/* Cart */}
             <li>
               <Link to="/cart">
                 Cart
-                {cart.totalCount > 0 && (
-                  <span className={classes.cart_count}>{cart.totalCount}</span>
+                {cartCount > 0 && (
+                  <span className={classes.cart_count}>{cartCount}</span>
                 )}
               </Link>
             </li>

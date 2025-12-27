@@ -1,47 +1,48 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const Order = require("../models/Order");
+
 const router = express.Router();
 
-// Create a new order
-router.post("/", async (req, res) => {
-  try {
-    const order = new Order({
-      vendorId: req.body.vendorId,
-      customerName: req.body.customerName,
-      items: req.body.items.map((item) => ({
-        foodId: item.foodId,
-        quantity: item.quantity,
-      })),
-    });
-
-    const savedOrder = await order.save();
-    res.status(201).json(savedOrder);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ✅ GET ALL ORDERS FOR A VENDOR (MUST COME FIRST)
+/**
+ * GET orders for a vendor
+ */
 router.get("/vendor/:vendorId", async (req, res) => {
+  const { vendorId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(vendorId)) {
+    return res.status(400).json({ error: "Invalid vendor ID" });
+  }
+
   try {
-    const orders = await Order.find({ vendorId: req.params.vendorId })
-      .populate("items.foodId", "name price")
-      .populate("vendorId", "name")
+    const orders = await Order.find({ vendorId })
+      .populate("items.foodId") // 🔥 THIS FIXES THE ERROR
       .sort({ createdAt: -1 });
 
     res.json(orders);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Failed to get vendor orders" });
+    res.status(500).json({ error: "Failed to fetch orders" });
   }
 });
 
-// ✅ GET SINGLE ORDER (TRACKING)
-router.get("/:id", async (req, res) => {
+/**
+ * UPDATE order status
+ */
+router.put("/:orderId/status", async (req, res) => {
+  const { orderId } = req.params;
+  const { status } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(orderId)) {
+    return res.status(400).json({ error: "Invalid order ID" });
+  }
+
   try {
-    const order = await Order.findById(req.params.id)
-      .populate("items.foodId", "name price")
-      .populate("vendorId", "name");
+    const order = await Order.findByIdAndUpdate(
+      orderId,
+      { status },
+      { new: true }
+    );
 
     if (!order) {
       return res.status(404).json({ error: "Order not found" });
@@ -50,26 +51,7 @@ router.get("/:id", async (req, res) => {
     res.json(order);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Failed to get order" });
-  }
-});
-
-// Update order status
-router.put("/:id/status", async (req, res) => {
-  try {
-    const { status } = req.body;
-    const order = await Order.findById(req.params.id);
-
-    if (!order) {
-      return res.status(404).json({ error: "Order not found" });
-    }
-
-    order.status = status;
-    await order.save();
-
-    res.json(order);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to update status" });
+    res.status(500).json({ error: "Failed to update order" });
   }
 });
 

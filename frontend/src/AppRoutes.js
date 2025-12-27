@@ -13,7 +13,7 @@ export default function AppRoutes() {
       <Route path="/vendor/:id" element={<VendorPage />} />
       <Route path="/order/:id" element={<OrderTracking />} />
       <Route path="/vendor/login" element={<VendorLogin />} />
-      <Route path="/vendor/dashboard" element={<VendorDashboard />} />
+      <Route path="/vendor/dashboard/:vendorId" element={<VendorDashboard />} />
     </Routes>
   );
 }
