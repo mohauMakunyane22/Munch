@@ -9,7 +9,11 @@ const VendorDashboard = () => {
 
   useEffect(() => {
     if (!vendorId) return;
+
     fetchOrders();
+    const interval = setInterval(fetchOrders, 3000);
+
+    return () => clearInterval(interval);
   }, [vendorId]);
 
   const fetchOrders = async () => {
@@ -60,7 +64,7 @@ const VendorDashboard = () => {
     );
   }
 
-  if (loading) return <p style={{ padding: "2rem" }}>Loading orders...</p>;
+  //if (loading) return <p style={{ padding: "2rem" }}>Loading orders...</p>;
 
   if (error) {
     return (
